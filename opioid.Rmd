@@ -6,8 +6,8 @@ date: "2023-11-06"
 
 ```{r}
 df<- read.csv("clean_data1.csv")
-demo<-read.csv("demographics.csv")
-demo<-demo[-c(32:34)]
+#demo<-read.csv("demographics.csv")
+#demo<-demo[-c(32:34)]
 df<- df[-c(1,22:29)]
 df<-df[-(469:1048575),]
 df$Geo_Desc<- as.factor(df$Geo_Desc)
@@ -19,6 +19,11 @@ df$Year<- as.factor(df$Year)
 ```{r}
 nation_data <- df[df$Geo_Desc == "United States", ]
 nation_data <- nation_data[, -2] 
+#removes any commas
+nation_data[] <- lapply(nation_data, function(x) gsub(",", "", x))
+#converts to numeric
+nation_data[] <- lapply(nation_data, as.numeric)
+
 ```
 
 
