@@ -1,0 +1,50 @@
+---
+title: "opioid2"
+output: word_document
+date: "2023-11-07"
+---
+```{r}
+df<- read.csv("clean_data1.csv")
+demo<-read.csv("demographics.csv")
+demo<-demo[-c(32:34)]
+#demo<-read.csv("demographics.csv")
+#demo<-demo[-c(32:34)]
+df<- df[-c(1,22:29)]
+df<-df[-(469:1048575),]
+df$Geo_Desc<- as.factor(df$Geo_Desc)
+df$Year<- as.factor(df$Year)
+#df$Black.or.African.American..Estimated.<-as.numeric(df$Black.or.African.American..Estimated.)
+```
+
+```{r}
+nation_data <- df[df$Geo_Desc == "United States", ]
+nation_data <- nation_data[, -2] 
+#removes any commas
+nation_data[] <- lapply(nation_data, function(x) gsub(",", "", x))
+#converts to numeric
+nation_data[] <- lapply(nation_data, as.numeric)
+```
+
+```{r}
+nation_data <- nation_data[, -c(2,8,9,10,11,12,13,14,15,16,17,18)]
+```
+
+
+```{r}
+lm1<- lm(data=nation_data,
+         tot_presc_opioid_od~.)
+summary(lm1)
+```
+
+```{r}
+plot(lm1)
+```
+
+
+```{r}
+library(ggplot2)
+boxplot(tot_presc_opioid_od~., data= nation_data)
+```
+
+
+
