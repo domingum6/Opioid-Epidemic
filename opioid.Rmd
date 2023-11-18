@@ -10,7 +10,6 @@ column_info <- data.frame(
   Column_Name = names(df),
   Column_Number = seq_along(df)
 )
-
 print(column_info)
 
 ```
@@ -36,27 +35,27 @@ valid_prescribed.df <- prescribed.df[-train_prescribed.index, ]
 ```
 ## Model for predicting synthetic opioid overdoses
 ```{r}
-logit.reg.synthetic <- glm(X.Synthetic.Opioids.other.than.Methadone..primarily.fentanyl..Overdose.Rate ~ ., data = train_synthetic.df, family = "binomial") 
-summary(logit.reg.synthetic)
+linear.reg.synthetic <- lm(X.Synthetic.Opioids.other.than.Methadone..primarily.fentanyl..Overdose.Rate ~ ., data = train_synthetic.df) 
+summary(linear.reg.synthetic)
 ```
 
 ## Model for predicting prescribed opioid overdoses
 ```{r}
-logit.reg.prescribed <- glm(Prescription.Opioid.Overdose.Rate ~ ., data = train_prescribed.df, family = "binomial") 
+linear.reg.prescribed <- glm(Prescription.Opioid.Overdose.Rate ~ ., data = train_prescribed.df) 
 
-summary(logit.reg.prescribed)
+summary(linear.reg.prescribed)
 
 ```
 
 ## Prediction for synthetic opioid overdoses
 ```{r}
-predictions_synthetic <- predict(logit.reg.synthetic, valid_synthetic.df, type = "response")
+predictions_synthetic <- predict(linear.reg.synthetic, valid_synthetic.df, type = "response")
 data.frame(actual = valid_synthetic.df$X.Synthetic.Opioids.other.than.Methadone..primarily.fentanyl..Overdose.Rate[1:5], predicted = predictions_synthetic[1:5])
 ```
 
 ## Prediction for prescribed opioid overdoses
 ```{r}
-predictions_prescribed <- predict(logit.reg.prescribed, valid_prescribed.df, type = "response")
+predictions_prescribed <- predict(linear.reg.prescribed, valid_prescribed.df, type = "response")
 data.frame(actual = valid_prescribed.df$Prescription.Opioid.Overdose.Rate[1:5], predicted = predictions_prescribed[1:5])
 ```
 
