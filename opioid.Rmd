@@ -3,35 +3,60 @@ title: "opioid"
 output: word_document
 date: "2023-11-06"
 ---
-
+## Dataset
 ```{r}
-df<- read.csv("clean_data1.csv")
-#demo<-read.csv("demographics.csv")
-#demo<-demo[-c(32:34)]
-df<- df[-c(1,22:29)]
-df<-df[-(469:1048575),]
-df$Geo_Desc<- as.factor(df$Geo_Desc)
-df$Year<- as.factor(df$Year)
-#df$Black.or.African.American..Estimated.<-as.numeric(df$Black.or.African.American..Estimated.)
-```
+df<- read.csv("HA_Dataset_Final.csv")
+column_info <- data.frame(
+  Column_Name = names(df),
+  Column_Number = seq_along(df)
+)
 
-
-```{r}
-nation_data <- df[df$Geo_Desc == "United States", ]
-nation_data <- nation_data[, -2] 
-#removes any commas
-nation_data[] <- lapply(nation_data, function(x) gsub(",", "", x))
-#converts to numeric
-nation_data[] <- lapply(nation_data, as.numeric)
+print(column_info)
 
 ```
 
-
 ```{r}
-lin1<- lm(data=nation_data,
-          tot_presc_opioid_od~.,)
-lin1
+synthetic.df<-df[ , -c(18, 19)]  
+prescribed.df<-df[ , -c(18, 20)] 
 ```
 
+## Training & Validation sets
+```{r}
+set.seed(42)
+#synthetic
+train_synthetic.index <- sample(c(1:dim(synthetic.df)[1]), dim(synthetic.df)[1]*0.6)  
+train_synthetic.df <- synthetic.df[train_synthetic.index, ]
+valid_synthetic.df <- synthetic.df[-train_synthetic.index, ]
 
+#prescribed
+train_prescribed.index <- sample(c(1:dim(prescribed.df)[1]), dim(prescribed.df)[1]*0.6)  
+train_prescribed.df <- prescribed.df[train_prescribed.index, ]
+valid_prescribed.df <- prescribed.df[-train_prescribed.index, ]
+
+```
+## Model for predicting synthetic opioid overdoses
+```{r}
+logit.reg.synthetic <- glm(X.Synthetic.Opioids.other.than.Methadone..primarily.fentanyl..Overdose.Rate ~ ., data = train_synthetic.df, family = "binomial") 
+summary(logit.reg.synthetic)
+```
+
+## Model for predicting prescribed opioid overdoses
+```{r}
+logit.reg.prescribed <- glm(Prescription.Opioid.Overdose.Rate ~ ., data = train_prescribed.df, family = "binomial") 
+
+summary(logit.reg.prescribed)
+
+```
+
+## Prediction for synthetic opioid overdoses
+```{r}
+predictions_synthetic <- predict(logit.reg.synthetic, valid_synthetic.df, type = "response")
+data.frame(actual = valid_synthetic.df$X.Synthetic.Opioids.other.than.Methadone..primarily.fentanyl..Overdose.Rate[1:5], predicted = predictions_synthetic[1:5])
+```
+
+## Prediction for prescribed opioid overdoses
+```{r}
+predictions_prescribed <- predict(logit.reg.prescribed, valid_prescribed.df, type = "response")
+data.frame(actual = valid_prescribed.df$Prescription.Opioid.Overdose.Rate[1:5], predicted = predictions_prescribed[1:5])
+```
 
