@@ -12,10 +12,14 @@ column_info <- data.frame(
 )
 print(column_info)
 
+na_check <- apply(df, 1, function(row) any(is.na(row)))
+
+print(na_check)
+
 ```
 
 ```{r}
-synthetic.df<-df[ , -c(18, 19)]  
+synthetic.df<-df[ , -c(12, 13,14,15,16,17,18, 19)] #taking out prescribed data 
 prescribed.df<-df[ , -c(18, 20)] 
 ```
 
@@ -51,11 +55,31 @@ summary(linear.reg.prescribed)
 ```{r}
 predictions_synthetic <- predict(linear.reg.synthetic, valid_synthetic.df, type = "response")
 data.frame(actual = valid_synthetic.df$X.Synthetic.Opioids.other.than.Methadone..primarily.fentanyl..Overdose.Rate[1:5], predicted = predictions_synthetic[1:5])
+
+#Mean Absolute Error
+mae_synthetic<-mean(abs(predictions_synthetic - valid_synthetic.df$X.Synthetic.Opioids.other.than.Methadone..primarily.fentanyl..Overdose.Rate))
+mae_synthetic
+#Mean Squared Error
+mse_synthetic<-mean((predictions_synthetic - valid_synthetic.df$X.Synthetic.Opioids.other.than.Methadone..primarily.fentanyl..Overdose.Rate)^2)
+mse_synthetic
+#Root Mean Squared Error
+rmse_synthetic <- sqrt(mse_synthetic)
+rmse_synthetic
 ```
 
 ## Prediction for prescribed opioid overdoses
 ```{r}
 predictions_prescribed <- predict(linear.reg.prescribed, valid_prescribed.df, type = "response")
 data.frame(actual = valid_prescribed.df$Prescription.Opioid.Overdose.Rate[1:5], predicted = predictions_prescribed[1:5])
+#Mean Absolute Error
+mae_prescribed<-mean(abs(predictions_prescribed -valid_prescribed.df$Prescription.Opioid.Overdose.Rate))
+mae_prescribed
+#Mean Squared Error
+mse_prescribed<-mean((predictions_prescribed - valid_prescribed.df$Prescription.Opioid.Overdose.Rate)^2)
+mse_prescribed
+#Root Mean Squared Error
+rmse_prescribed <- sqrt(mse_prescribed)
+rmse_prescribed
+
 ```
 
