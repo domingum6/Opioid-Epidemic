@@ -23,63 +23,52 @@ synthetic.df<-df[ , -c(12, 13,14,15,16,17,18, 19)] #taking out prescribed data
 prescribed.df<-df[ , -c(18, 20)] 
 ```
 
-## Training & Validation sets
-```{r}
-set.seed(42)
-#synthetic
-train_synthetic.index <- sample(c(1:dim(synthetic.df)[1]), dim(synthetic.df)[1]*0.6)  
-train_synthetic.df <- synthetic.df[train_synthetic.index, ]
-valid_synthetic.df <- synthetic.df[-train_synthetic.index, ]
-
-#prescribed
-train_prescribed.index <- sample(c(1:dim(prescribed.df)[1]), dim(prescribed.df)[1]*0.6)  
-train_prescribed.df <- prescribed.df[train_prescribed.index, ]
-valid_prescribed.df <- prescribed.df[-train_prescribed.index, ]
-
-```
 ## Model for predicting synthetic opioid overdoses
 ```{r}
-linear.reg.synthetic <- lm(X.Synthetic.Opioids.other.than.Methadone..primarily.fentanyl..Overdose.Rate ~ ., data = train_synthetic.df) 
+linear.reg.synthetic <- lm(X.Synthetic.Opioids.other.than.Methadone..primarily.fentanyl..Overdose.Rate ~ ., data = synthetic.df) 
 summary(linear.reg.synthetic)
+```
+Visualization:
+```{r}
+plot(linear.reg.synthetic, which = 1)
+plot(linear.reg.synthetic, which = 2)
+plot(linear.reg.synthetic, which = 3)
+plot(linear.reg.synthetic, which = 5)
+
+# scatter plot to compare predicted and observed values.
+predicted_values <- predict(linear.reg.synthetic)
+observed_values <- synthetic.df$X.Synthetic.Opioids.other.than.Methadone..primarily.fentanyl..Overdose.Rate
+plot(observed_values, predicted_values, 
+     xlab = "Observed Values", ylab = "Predicted Values",
+     main = "Observed vs. Predicted")
+abline(0, 1, col = "red")
+
+
 ```
 
 ## Model for predicting prescribed opioid overdoses
 ```{r}
-linear.reg.prescribed <- glm(Prescription.Opioid.Overdose.Rate ~ ., data = train_prescribed.df) 
-
+linear.reg.prescribed <- lm(Prescription.Opioid.Overdose.Rate ~ ., data = prescribed.df) 
 summary(linear.reg.prescribed)
 
 ```
-
-## Prediction for synthetic opioid overdoses
+Visualization:
 ```{r}
-predictions_synthetic <- predict(linear.reg.synthetic, valid_synthetic.df, type = "response")
-data.frame(actual = valid_synthetic.df$X.Synthetic.Opioids.other.than.Methadone..primarily.fentanyl..Overdose.Rate[1:5], predicted = predictions_synthetic[1:5])
+plot(linear.reg.prescribed, which = 1)
+plot(linear.reg.prescribed, which = 2)
+plot(linear.reg.prescribed, which = 3)
+plot(linear.reg.prescribed, which = 5)
 
-#Mean Absolute Error
-mae_synthetic<-mean(abs(predictions_synthetic - valid_synthetic.df$X.Synthetic.Opioids.other.than.Methadone..primarily.fentanyl..Overdose.Rate))
-mae_synthetic
-#Mean Squared Error
-mse_synthetic<-mean((predictions_synthetic - valid_synthetic.df$X.Synthetic.Opioids.other.than.Methadone..primarily.fentanyl..Overdose.Rate)^2)
-mse_synthetic
-#Root Mean Squared Error
-rmse_synthetic <- sqrt(mse_synthetic)
-rmse_synthetic
+# scatter plot to compare predicted and observed values.
+predicted_values2 <- predict(linear.reg.prescribed)
+observed_values2 <- prescribed.df$Prescription.Opioid.Overdose.Rate
+plot(observed_values2, predicted_values2, 
+     xlab = "Observed Values", ylab = "Predicted Values",
+     main = "Observed vs. Predicted")
+abline(0, 1, col = "red")
+
 ```
 
-## Prediction for prescribed opioid overdoses
-```{r}
-predictions_prescribed <- predict(linear.reg.prescribed, valid_prescribed.df, type = "response")
-data.frame(actual = valid_prescribed.df$Prescription.Opioid.Overdose.Rate[1:5], predicted = predictions_prescribed[1:5])
-#Mean Absolute Error
-mae_prescribed<-mean(abs(predictions_prescribed -valid_prescribed.df$Prescription.Opioid.Overdose.Rate))
-mae_prescribed
-#Mean Squared Error
-mse_prescribed<-mean((predictions_prescribed - valid_prescribed.df$Prescription.Opioid.Overdose.Rate)^2)
-mse_prescribed
-#Root Mean Squared Error
-rmse_prescribed <- sqrt(mse_prescribed)
-rmse_prescribed
 
-```
+
 
